@@ -89,7 +89,6 @@ if __name__ == "__main__":
                 )
                 text_box.send_keys(f"Roll no. {roll}")
                 print("Attendence marked!")
-                time.sleep(10)
     except Exception as e:
         print(e)
     finally:
