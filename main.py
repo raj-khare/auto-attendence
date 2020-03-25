@@ -1,12 +1,12 @@
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-import time
 from os import path
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 import pickle
 import datetime
+from time import sleep
 
 
 def get_credentials():
@@ -29,6 +29,7 @@ def get_time_table(driver, username, password):
         driver.get("https://ums.lpu.in/lpuums/")
         driver.find_element_by_class_name("input_type").send_keys(username)
         driver.find_element_by_class_name("login_box").click()
+        sleep(3)
         driver.find_element_by_class_name(
             "input_type_pass").send_keys(password)
         Select(driver.find_element_by_id(
@@ -72,26 +73,26 @@ if __name__ == "__main__":
         username, password, roll = get_credentials()
         time_table = get_time_table(driver, username, password)
         course = get_current_class(time_table)
+        course = "INT404"
         if course is None:
-            print("You don't have a current class.")
-        else:
-            driver.get("https://lpulive.lpu.in/login")
-            driver.find_element_by_id("inputEmail").send_keys(username)
-            password = driver.find_element_by_id(
-                "inputPassword").send_keys(password)
-            driver.find_element_by_tag_name("button").click()
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, "chat-input"))
-            )
-            courses = driver.find_elements_by_css_selector(".conv-label")
-            for c in courses:
-                if course in c.text:
-                    c.click()
-                    text_box = WebDriverWait(driver, 10).until(
-                        EC.presence_of_element_located((By.ID, "chat-input"))
-                    )
-                    text_box.send_keys(f"Roll no. {roll}")
-                    print("Attendence marked!")
+            raise Exception("You don't have a current class.")
+        driver.get("https://lpulive.lpu.in/login")
+        driver.find_element_by_id("inputEmail").send_keys(username)
+        password = driver.find_element_by_id(
+            "inputPassword").send_keys(password)
+        driver.find_element_by_tag_name("button").click()
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.ID, "chat-input"))
+        )
+        courses = driver.find_elements_by_css_selector(".conv-label")
+        for c in courses:
+            if course in c.text:
+                c.click()
+                text_box = WebDriverWait(driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "chat-input"))
+                )
+                text_box.send_keys(f"Roll no. {roll}")
+                print("Attendence marked!")
     except Exception as e:
         print(e)
     finally:
